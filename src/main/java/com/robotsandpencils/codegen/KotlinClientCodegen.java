@@ -1,7 +1,9 @@
 package com.robotsandpencils.codegen;
 
 import io.swagger.codegen.*;
-import io.swagger.models.parameters.Parameter;
+import io.swagger.models.Model;
+import io.swagger.models.Operation;
+import io.swagger.models.Swagger;
 import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.MapProperty;
 import io.swagger.models.properties.Property;
@@ -27,6 +29,8 @@ public class KotlinClientCodegen extends DefaultCodegen implements CodegenConfig
      */
     public KotlinClientCodegen() {
         super();
+
+        //sortParamsByRequiredFlag = false;
 
         outputFolder = "generated-code" + File.separator + "kotlin-retrofit2-client";
         modelTemplateFiles.put("model.mustache", ".kt");
@@ -385,5 +389,45 @@ public class KotlinClientCodegen extends DefaultCodegen implements CodegenConfig
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
         return postProcessModelsEnum(super.postProcessModels(objs));
+    }
+
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, Map<String, Model> definitions, Swagger swagger) {
+        CodegenOperation codegenOperation = super.fromOperation(path, httpMethod, operation, definitions, swagger);
+
+
+        // Attempt to order the parameters because our code generator needs that
+        List<CodegenParameter> allParams = codegenOperation.allParams;
+
+        Collections.sort(allParams, new Comparator<CodegenParameter>() {
+
+            int HEADER = 0;
+            int PATH = 1;
+            int QUERY = 2;
+            int BODY = 3;
+            int FORM = 4;
+
+            @Override
+            public int compare(CodegenParameter o1, CodegenParameter o2) {
+                int i1 = 0;
+                int i2 = 0;
+
+                if (o1.isHeaderParam) i1 = HEADER;
+                if (o1.isPathParam) i1 = PATH;
+                if (o1.isQueryParam) i1 = QUERY;
+                if (o1.isBodyParam) i1 = BODY;
+                if (o1.isFormParam) i1 = FORM;
+
+                if (o2.isHeaderParam) i2 = HEADER;
+                if (o2.isPathParam) i2 = PATH;
+                if (o2.isQueryParam) i2 = QUERY;
+                if (o2.isBodyParam) i2 = BODY;
+                if (o2.isFormParam) i2 = FORM;
+
+                return Integer.compare(i1, i2);
+            }
+        });
+
+        return codegenOperation;
     }
 }
