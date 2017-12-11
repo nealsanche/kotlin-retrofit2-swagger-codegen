@@ -13,10 +13,10 @@ data class {{classname}} (
 ) {
 {{#hasEnums}}{{#vars}}{{#isEnum}}
 
-    enum class {{nameInCamelCase}}(val value: {{datatype}}) {
-    {{#_enum}}
-        {{{this}}}({{#isString}}"{{/isString}}{{{this}}}{{#isString}}"{{/isString}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
-    {{/_enum}}
+    enum class {{enumName}}(val value: String) {
+    {{#allowableValues}}{{#enumVars}}
+        {{name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}}{{/-last}}
+    {{/enumVars}}{{/allowableValues}}
     }
 {{/isEnum}}{{/vars}}{{/hasEnums}}
 }
