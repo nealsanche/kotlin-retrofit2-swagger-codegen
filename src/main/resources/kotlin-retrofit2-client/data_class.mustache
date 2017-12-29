@@ -1,7 +1,4 @@
-import android.annotation.SuppressLint
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.android.parcel.Parcelize
 
 /**
  * {{{description}}}
@@ -9,14 +6,13 @@ import kotlinx.android.parcel.Parcelize
  * @param {{name}} {{{description}}} {{#required}}(required){{/required}}
 {{/vars}}
  */
-@SuppressLint("ParcelCreator")
-@Parcelize data class {{classname}} (
+data class {{classname}} (
 {{#vars}}
 {{#required}}{{>data_class_req_var}}{{^-last}},
 {{/-last}}{{/required}}{{^required}}{{>data_class_opt_var}}{{^-last}},
 {{/-last}}{{/required}}
 {{/vars}}
-) : Parcelable {
+) {
 {{#hasEnums}}{{#vars}}{{#isEnum}}
 
     enum class {{enumName}}(val value: String) {
